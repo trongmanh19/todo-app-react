@@ -53,6 +53,10 @@ class App extends Component {
           ...todoItems.slice(itemIndex + 1, todoItems.length)
         ]
       });
+      this.todoItemsBackup = [
+        ...todoItems.slice(0, itemIndex),
+        ...todoItems.slice(itemIndex + 1, todoItems.length)
+      ];
     }
   }
 
@@ -66,12 +70,19 @@ class App extends Component {
         title: valueNewItem,
         isComplete: false
       };
-      const { todoItems: currentTodos } = this.state;
+      const currentTodos = this.todoItemsBackup;
       const newItemIndex = currentTodos.findIndex(item => item.title === newItem.title);
       if (newItemIndex === -1) {
-        this.setState({
-          todoItems: [...currentTodos, newItem],
-        });
+        this.setState(
+          {
+            todoItems: [...currentTodos, newItem],
+            listFilters: [
+              { name: 'All', isSelected: true },
+              { name: 'Active', isSelected: false },
+              { name: 'Completed', isSelected: false }
+            ]
+          }
+        );
         this.todoItemsBackup = [...currentTodos, newItem];
       }
     }
@@ -118,31 +129,33 @@ class App extends Component {
     const { todoItems, listFilters } = this.state;
     const totalLeftItems = this.todoItemsBackup.filter(item => !item.isComplete).length;
     return (
-      <div className="App">
-        <NewItem onKeyPress={this.onKeyPress} />
-        <div className="ToDoList">
+      <div className={this.todoItemsBackup.length ? 'App app-has-item' : 'App'}>
+        <div className="container">
+          <NewItem onKeyPress={this.onKeyPress} />
+          <div className="ToDoList">
+            {
+              todoItems.length > 0 && todoItems.map((item, index) => 
+                <TodoItem 
+                  key={index} 
+                  onChangeStatus={this.onItemClicked(item)}
+                  onClickRemove={this.onItemRemove(item)}
+                  item={item} />)
+            }
+            { !todoItems.length && 'Nothing data'}
+          </div>
+          <FilterArea totalLeftItems={totalLeftItems} totalItems={this.todoItemsBackup.length}>
           {
-            todoItems.length > 0 && todoItems.map((item, index) => 
-              <TodoItem 
-                key={index} 
-                onChangeStatus={this.onItemClicked(item)}
-                onClickRemove={this.onItemRemove(item)}
-                item={item} />)
-          }
-          { !todoItems.length && 'Nothing data'}
+            listFilters.map((filterItem, index) => {
+              return <button type="button"
+                        className={filterItem.isSelected ? 'filter-active btn-filter' : 'btn-filter'}
+                        key={index}
+                        onClick={this.onFilterItem(filterItem)}>
+                          {filterItem.name}
+                      </button>
+            })
+            }
+          </FilterArea>
         </div>
-        <FilterArea totalLeftItems={totalLeftItems} totalItems={this.todoItemsBackup.length}>
-        {
-          listFilters.map((filterItem, index) => {
-            return <button type="button"
-                      className={filterItem.isSelected ? 'filter-active' : ''}
-                      key={index}
-                      onClick={this.onFilterItem(filterItem)}>
-                        {filterItem.name}
-                    </button>
-          })
-          }
-        </FilterArea>
       </div>
     );
   }
