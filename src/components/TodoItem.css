@@ -1,0 +1,11 @@
+.TodoItem {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 5px 0;
+}
+
+.TodoItem-complete {
+	text-decoration: line-through;
+	opacity: 0.3;
+}

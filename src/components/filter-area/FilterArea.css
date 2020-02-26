@@ -1,0 +1,19 @@
+.footer,
+.footer__filter-area {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.footer {
+  padding: 10px 0;
+  border-top: 1px solid #f3eded;
+}
+
+.footer-hidden {
+  display: none;
+}
+
+.footer__filter-area {
+  width: 60%;
+}

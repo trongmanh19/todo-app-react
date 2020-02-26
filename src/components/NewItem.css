@@ -1,0 +1,11 @@
+.input-item {
+  display: block;
+  width: 100%;
+  padding: 10px 0;
+  font-size: 14px;
+  border: none;
+  box-shadow: 0 0 1px 0 #824d4d;
+  margin: 0px;
+  outline: none;
+  text-indent: 10px;
+}
