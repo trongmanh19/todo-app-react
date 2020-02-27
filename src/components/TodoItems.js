@@ -4,18 +4,33 @@ import React, {
 import './TodoItem.css';
 
 class TodoItem extends Component {
-	state = {}
+	state = {
+		isEdited: false
+	}
 
 	render() {
-		const { item, onChangeStatus, onClickRemove } = this.props;
-		let className = 'TodoItem';
-		className = item.isComplete ? `${className} TodoItem-complete`: className;
+		const { item, onChangeStatus, onClickRemove, onChangeValue } = this.props;
+		let todoItemClass = 'todo-item';
+		todoItemClass = item.isComplete ? `${todoItemClass} todo-item-complete`: todoItemClass;
 		return (
-			<div className={className}>
-				<div className="selectbox-item">
-					<input type="checkbox"/>
+			<div className={todoItemClass}>
+				<div>
+					<input type="checkbox" checked={item.isComplete} onChange={onChangeStatus}/>
 				</div>
-				<div onClick={onChangeStatus}>{this.props.item.title}</div>
+				<div className="todo-item-title" onDoubleClick={() => this.setState({isEdit: true})}>
+					{
+						this.state.isEdit ? 
+							<input type="text"
+								className="todo-item-input-title"
+								autoFocus={true}
+								id={item.title}
+								value={item.title}
+								onBlur={() => this.setState({isEdit: false})}
+								onChange={onChangeValue}
+							/> : <p>{item.title}</p>
+					}
+					
+				</div>
 				<button type="button" onClick={onClickRemove} className="btn-remove-item">
 					<span>x</span>
 				</button>

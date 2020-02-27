@@ -5,10 +5,17 @@ class NewItem extends Component {
   state = {  };
 
   render() {
-    const { onKeyPress } = this.props;
+    const { onKeyPress, onChange, inputValue, onClickAll } = this.props;
     return ( 
       <div className="input-item-container">
-        <input type="text" className="input-item" placeholder="What need to be done?" onKeyPress={onKeyPress}></input>
+        <span className="select-all-btn" onClick={onClickAll}><i className="arrow-down" /></span>
+        <input type="text" 
+          className="input-item" 
+          placeholder="What need to be done?" 
+          value={inputValue}
+          onChange={onChange} 
+          onKeyPress={onKeyPress}
+        />
       </div>
     );
   }

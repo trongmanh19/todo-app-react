@@ -7,7 +7,11 @@ import FilterArea from './components/filter-area/FilterArea';
 
 class App extends Component {
   state = {
-    todoItems: [],
+    newItemValue: '',
+    todoItems: [
+      // {title: '12345', isComplete: true},
+      // {title: '12345978', isComplete: false},
+    ],
     listFilters: [
       { name: 'All', isSelected: true },
       { name: 'Active', isSelected: false },
@@ -17,7 +21,87 @@ class App extends Component {
 
   todoItemsBackup = [...this.state.todoItems];
 
-  onItemClicked(item) {
+  onInputNewItem = (event) => {    
+    const { value } = event.target;
+    this.setState({newItemValue: value});
+  }
+
+  onCreateNewItem = (event) => {
+    if(event.key === 'Enter') {
+      const { value: valueNewItem } = event.target;
+      if (!valueNewItem) {
+        return;
+      }
+      const newItem = {
+        title: valueNewItem,
+        isComplete: false
+      };
+      const currentTodos = this.todoItemsBackup;
+      const newItemIndex = currentTodos.findIndex(item => item.title === newItem.title);
+      if (newItemIndex === -1) {
+        this.setState(
+          {
+            newItemValue: '' ,
+            todoItems: [...currentTodos, newItem],
+            listFilters: [
+              { name: 'All', isSelected: true },
+              { name: 'Active', isSelected: false },
+              { name: 'Completed', isSelected: false }
+            ]
+          }
+        );
+        this.todoItemsBackup = [...currentTodos, newItem];
+      }
+    }
+  }
+  
+  onUpdateValueInput = (event) => {
+    const { todoItems } = this.state;
+    const { id, value } = event.target;
+    const itemIndex = todoItems.findIndex(item => item.title === id);
+    if (!value) {
+      const items = this.removeItem(todoItems, itemIndex);
+      console.log(items);
+      
+      this.setState({
+        todoItems: items
+      });
+      this.todoItemsBackup = items;
+      return;
+    }
+    if (itemIndex !== -1 && value) {
+      todoItems[itemIndex].title = value;
+    }
+    this.setState({ todoItems });
+    this.todoItemsBackup = todoItems;
+  }
+
+  onCompleteAll = () => {
+    const { todoItems, listFilters } = this.state;
+    const filterType = listFilters.filter(item => item.isSelected === true)[0].name;
+    console.log(filterType);
+    
+    let todoItemsComplete;
+    switch(filterType) {
+      case 'Completed':
+        todoItemsComplete = todoItems.map(item => {
+          item.isComplete = false;
+          return item;
+        });
+        // this.setState({todoItems: todoItemsComplete});
+        break;
+      default:
+        todoItemsComplete = todoItems.map(item => {
+          item.isComplete = true;
+          return item;
+        });
+        // this.setState({todoItems: todoItemsComplete});
+        break;
+    }
+    this.setState({todoItems: todoItemsComplete});
+  }
+
+  onItemChangeStatus(item) {
     return () => {
       const isComplete = item.isComplete;
       const { todoItems } = this.state;
@@ -58,35 +142,7 @@ class App extends Component {
         ...todoItems.slice(itemIndex + 1, todoItems.length)
       ];
     }
-  }
-
-  onKeyPress = (event) => {
-    if(event.key === 'Enter') {
-      const valueNewItem = event.target.value;
-      if (!valueNewItem) {
-        return;
-      }
-      const newItem = {
-        title: valueNewItem,
-        isComplete: false
-      };
-      const currentTodos = this.todoItemsBackup;
-      const newItemIndex = currentTodos.findIndex(item => item.title === newItem.title);
-      if (newItemIndex === -1) {
-        this.setState(
-          {
-            todoItems: [...currentTodos, newItem],
-            listFilters: [
-              { name: 'All', isSelected: true },
-              { name: 'Active', isSelected: false },
-              { name: 'Completed', isSelected: false }
-            ]
-          }
-        );
-        this.todoItemsBackup = [...currentTodos, newItem];
-      }
-    }
-  }
+  } 
 
   onFilterItem(filterItem) {
     return () => {
@@ -121,27 +177,39 @@ class App extends Component {
     }
   }
 
+  removeItem = (todoItems, itemIndex) => {
+    return [
+      ...todoItems.slice(0, itemIndex),
+      ...todoItems.slice(itemIndex + 1, todoItems.length)
+    ];
+  }
+
   constructor() {
     super();
   }
 
   render() {
-    const { todoItems, listFilters } = this.state;
+    const { todoItems, listFilters, newItemValue } = this.state;
     const totalLeftItems = this.todoItemsBackup.filter(item => !item.isComplete).length;
     return (
       <div className={this.todoItemsBackup.length ? 'App app-has-item' : 'App'}>
         <div className="container">
-          <NewItem onKeyPress={this.onKeyPress} />
+          <NewItem 
+            onKeyPress={this.onCreateNewItem}
+            inputValue={newItemValue}
+            onClickAll={this.onCompleteAll}
+            onChange={this.onInputNewItem} />
           <div className="ToDoList">
             {
               todoItems.length > 0 && todoItems.map((item, index) => 
                 <TodoItem 
                   key={index} 
-                  onChangeStatus={this.onItemClicked(item)}
+                  onChangeStatus={this.onItemChangeStatus(item)}
                   onClickRemove={this.onItemRemove(item)}
+                  onChangeValue={this.onUpdateValueInput}
                   item={item} />)
             }
-            { !todoItems.length && 'Nothing data'}
+            { !todoItems.length && <em style={{display: "block", color: "red", paddingTop: "10px"}}>Nothing data</em>}
           </div>
           <FilterArea totalLeftItems={totalLeftItems} totalItems={this.todoItemsBackup.length}>
           {

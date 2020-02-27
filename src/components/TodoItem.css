@@ -1,8 +1,10 @@
-.TodoItem {
+.todo-item {
+	position: relative;
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
 	padding: 10px 0;
+	margin-top: 5px;
 	border-bottom: 1px solid #f3eded;
 }
 
@@ -13,11 +15,32 @@
 	border: none;
 }
 
-.TodoItem:hover .btn-remove-item {
+.todo-item:hover .btn-remove-item {
 	opacity: 1;
 }
 
-.TodoItem-complete {
+.todo-item-complete .todo-item-title {
 	text-decoration: line-through;
 	opacity: 0.3;
+}
+
+.todo-item-title {
+	border: none;
+	outline: none;
+	width: 70%;
+	word-wrap: break-word;
+	font-size: 14px;
+}
+
+.todo-item-input-title {
+	position: absolute;
+	top: 0;
+	left: 10%;
+	bottom: 0;
+	box-shadow: 0 0 1px 0 #cf7e80;
+	outline: none;
+	border: none;
+	width: calc(90% - 3px);
+	text-indent: 10px;
+	font-size: 14px;
 }
